@@ -3,6 +3,8 @@
 # Added by Adnan
 src/contents/
 src/data/
+src/sandbox*.ipynb
+src/contents/ddpm_mnist.pth
 docs/
 .vscode/
 
