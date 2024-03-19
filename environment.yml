@@ -9,6 +9,7 @@ dependencies:
   - ipython==8.21.0
   - numpy==1.26.4
   - tqdm==4.66.2
+  - jupyter
   - pip
   - pip:
     - torch==2.2.0
