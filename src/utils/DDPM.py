@@ -82,7 +82,7 @@ class DDPM(nn.Module):
 
         return self.criterion(eps, preds)
 
-    def sample(self, n_sample: int, size, device) -> torch.Tensor:
+    def sample(self, n_sample: int, size, device, checkpoints: list = None) -> torch.Tensor:
         """
         Algorithm 18.2 in Prince.
 
@@ -96,17 +96,31 @@ class DDPM(nn.Module):
          The size of the samples to generate. Shape is (channels, height, width).
         device : torch.device
             The device to use for the samples.
+        checkpoints : list
+            A list of time steps to return the latent variables at, as well as the initial and final samples.
+            E.g., this can be provided as [750, 500, 250] and the final tensor will be of shape
+            (len(checkpoints) + 2, n_sample, *size) where the extra 2 are the initial and final samples,
+            with the rest being the latent variables at the specified time steps.
 
         Returns
         -------
         torch.Tensor
-         The generated samples.
+         The generated samples (with the checkpoints if provided).
         """
+        # create a checkpoints tensor, if required, to store the latent variable at the specified time steps
+        checkpoints = list(checkpoints) if checkpoints else None
+        checkpoint_tensors = torch.empty(n_sample, len(checkpoints) + 2, *size, device=device) if checkpoints else None
+
         # Create a tensor of ones with the same shape as the number of samples
         _one = torch.ones(n_sample, device=device)
 
         # Sample standard normal noise
         z_t = torch.randn(n_sample, *size, device=device)
+
+        # save the initial samples into checkpoint_tensors, if required
+        if checkpoints:
+            for i in range(n_sample):
+                checkpoint_tensors[i, 0] = z_t[i]
 
         # Iterate backwards through the noise schedule
         for i in range(self.n_T, 0, -1):
@@ -120,9 +134,21 @@ class DDPM(nn.Module):
             z_t -= (beta_t / torch.sqrt(1 - alpha_t)) * self.gt(z_t, (i / self.n_T) * _one)
             z_t /= torch.sqrt(1 - beta_t)
 
+            # if this iteration is a checkpoint value, save the latent variable into the checkpoint tensor
+            if checkpoints:
+                if i in checkpoints:
+                    for j in range(n_sample):
+                        checkpoint_tensors[j, checkpoints.index(i) + 1] = z_t[j]
+
             if i > 1:
                 # Last line of loop
                 z_t += torch.sqrt(beta_t) * torch.randn_like(z_t)
             # (We don't add noise at the final step - i.e., the last line of the algorithm)
 
-        return z_t
+        # save the final samples into checkpoint_tensors, if required
+        if checkpoints:
+            for i in range(n_sample):
+                checkpoint_tensors[i, -1] = z_t[i]
+
+        return z_t if checkpoints is None else checkpoint_tensors
+

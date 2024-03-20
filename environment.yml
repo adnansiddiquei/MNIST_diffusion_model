@@ -13,6 +13,7 @@ dependencies:
   - numpy==1.26.4
   - tqdm==4.66.2
   - jupyter
+  - matplotlib
 
 
 
