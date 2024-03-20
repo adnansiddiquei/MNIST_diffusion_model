@@ -51,12 +51,23 @@ The DDPM is instantiated with the CNN defined above and a linear noise schedule 
 0.02]$ across 1000 steps, as shown in Figure~\eqref{fig:q1a_noise_schedule}, where $\beta_{t}$ and $\alpha_{t}$ are as
 defined in Ch.18 Prince~\cite{prince}.
 
+\begin{figure}[thb]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/q1a_image_noising}
+    \caption{An illustration of the linear noise schedule applied to the first 4 MNIST images in the datastet.
+        The first column shows the original 28x28 image, and the subsequent 10 columns show the image after 100 steps
+        of the diffusion process.
+        The final column shows the image after 1000 steps.}
+    \label{fig:q1a_image_noising}
+\end{figure}
+
 The \inlinecode{forward} function samples 128 (the batch size) random $\alpha_{t}$ values from the noise schedule and
 a standard normally distributed noise tensor of shape \inlinecode{(128, 1, 28, 28)}, and degrades every image in the batch
 with the noise according to Equation~\eqref{eq:noise-schedule}~\cite{prince}.
 \begin{equation}\label{eq:noise-schedule}
     z_{t} = \sqrt{\alpha_{t}} \cdot \mathbf{x} + \sqrt{1 - \alpha_{t}} \cdot \mathbf{\epsilon}
 \end{equation}
+Figure~\eqref{fig:q1a_image_noising} illustrates the diffusion process.
 This batch of 128 noisy MNIST images (degraded to different extents) is then passed through the CNN (along with the
 corresponding time steps) to make a prediction on the noise that was added to the image at the corresponding step.
 The function returns the loss between the actual noise and this predicted noise as the mean squared error between the
