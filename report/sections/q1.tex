@@ -35,7 +35,7 @@ This CNN is the latter, and the \inlinecode{forward} function adds a time step d
 of the second layer so that the CNN can learn to revert the noise at any given step.
 
 \subsubsection{The DDPM Model}\label{subsubsec:ddpm-model}
-\begin{figure}[thb]
+\begin{figure}[t]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/q1a_noise_schedule}
     \caption{A plot of $\beta_{t}$ and $\alpha_{t}$ for the linear noise schedule used in coursework\_starter.ipynb.
@@ -51,7 +51,7 @@ The DDPM is instantiated with the CNN defined above and a linear noise schedule 
 0.02]$ across 1000 steps, as shown in Figure~\eqref{fig:q1a_noise_schedule}, where $\beta_{t}$ and $\alpha_{t}$ are as
 defined in Ch.18 Prince~\cite{prince}.
 
-\begin{figure}[thb]
+\begin{figure}[t]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/q1a_image_noising}
     \caption{An illustration of the linear noise schedule applied to the first 4 MNIST images in the datastet.
@@ -73,9 +73,20 @@ corresponding time steps) to make a prediction on the noise that was added to th
 The function returns the loss between the actual noise and this predicted noise as the mean squared error between the
 two.
 
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/q1a_image_reconstruction}
+    \caption{An illustration of the generation process.
+        This is the generation of 4 new MNIST samples from the model trained with the default parameters in the
+        coursework\_starter.ipynb notebook.
+        The first column shows the randomly sampled noise, the next 10 columns illustrate the image after 100 steps of
+        decoding, with the final column showing the final generated image.}
+    \label{fig:q1a_image_reconstruction}
+\end{figure}
 The \inlinecode{sample} function can generate new MNIST samples by iterating backwards through the diffusion process
 using the learned parameters of the CNN, and a random sample of standard normal noise.
+Figure \eqref{fig:q1a_image_reconstruction} illustrates the generation process.
 
 \subsubsection{The training loop}\label{subsubsec:training-loop}
 The training loop iterates over 100 epochs, using the Adam optimiser and a learning rate of $2 \times 10^{-4}$,
-saving generated samples from the model at every epoch along with the loss per epoch.
+saving generated samples from the model at every epoch along with the loss at each epoch.
