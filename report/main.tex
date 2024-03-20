@@ -12,8 +12,11 @@
 \usepackage{roboto}
 \usepackage{subcaption}
 \usepackage{blindtext}
+\usepackage{seqsplit}
 
-\newcommand{\inlinecode}[1]{\lstinline{#1}}
+%\newcommand{\inlinecode}[1]{\lstinline{#1}}
+%\newcommand{\inlinecode}[1]{\texttt{#1}}
+\newcommand{\inlinecode}[1]{\texttt{\seqsplit{#1}}}
 \lstset{basicstyle=\fontfamily{pcr}\selectfont}
 
 
@@ -34,16 +37,15 @@
 
 \input{sections/q1}
 
-
+\clearpage
 
 \begin{thebibliography}{99}
 
-%\bibitem{separable-kernel}
-%Steve Eddins,
-%\textit{Steve on Image Processing with MATLAB}.
-%Available at: \url{https://blogs.mathworks.com/steve/2006/10/04/separable-convolution/}
-%[Accessed: 8-Mar-2024].
-
+\bibitem{prince}
+Simon J.D.\ Prince,
+\textit{Understanding Deep Learning}.
+The MIT Press, 2023.
+Available at \url{https://udlbook.github.io/udlbook/} [Accessed: 20-Mar-2024].
 
 \end{thebibliography}
 
