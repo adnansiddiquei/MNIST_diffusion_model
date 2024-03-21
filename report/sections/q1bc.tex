@@ -48,6 +48,10 @@ $\beta_{t} = [10^{-4}, 0.004]$ with 5000 steps which added less noise at each st
 was trained with a shorter noise schedule: $\beta_{t} = [10^{-4}, 0.1]$ with 200 steps which added more noise at each step.
 The number of steps was amended for each model such that the final noise level was the same for each model ($\alpha_{t}$
 of the order of $10^{-5}$ at the final time step).
-Figure~\eqref{fig:q1b_noise_schedules} illustrates the noise schedules used for each model and Figure~\eqref{fig:q1b_training_loss}
-shows the training loss for each model over 100 epochs.
+All models were also trained for 100 epochs with a batch size of 128, with the Adams optimiser, a learning rate of
+$2 \ times 10^{-4}$ and the same CNN architecture described in Section~\eqref{sec:q1a}.
+Figure~\eqref{fig:q1b_noise_schedules} illustrates the noise schedules used for each model, Figure~\eqref{fig:q1b_training_loss}
+shows the training loss for each model over 100 epochs, and Figure~\eqref{fig:q1b_short_long_model_nd} illustrates the encoding
+and decoding process for the long and short models.
+
 
