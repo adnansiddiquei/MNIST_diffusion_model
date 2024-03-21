@@ -1,5 +1,41 @@
 from typing import Dict
 import torch
+import pickle
+
+
+def save_pickle(obj: object, path: str) -> None:
+    """
+    Save a Python object to a pickle file.
+
+    Parameters
+    ----------
+    obj : object
+        The Python object to save.
+    path : str
+        The path to save the object to.
+
+    """
+    with open(path, "wb") as f:
+        pickle.dump(obj, f)
+
+
+def load_pickle(path: str) -> object:
+    """
+    Load a Python object from a pickle file.
+
+    Parameters
+    ----------
+    path : str
+        The path to the pickle file.
+
+    Returns
+    -------
+    object
+        The Python object loaded from the pickle file.
+
+    """
+    with open(path, "rb") as f:
+        return pickle.load(f)
 
 
 def ddpm_schedules(beta1: float, beta2: float, T: int) -> Dict[str, torch.Tensor]:
