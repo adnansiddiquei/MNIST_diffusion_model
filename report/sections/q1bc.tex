@@ -40,6 +40,15 @@
 \label{fig:q1b_short_long_model_nd}
 \end{figure}
 
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/q1b_fid}
+    \caption{A plot of the Frechet Inception Distance (FID) for the generated samples from each model over 100 epochs.
+        The FID was calculated using the first 512 samples from the MNIST dataset compared against 32 samples generated
+        by each model at varying epochs.}
+    \label{fig:q1b_fid}
+\end{figure}
+
 This section discusses the training of the DDPM model with varying linear noise schedules.
 
 Three different models were trained, the first model (default model) was trained with the provided noise schedule:
@@ -53,5 +62,13 @@ $2 \ times 10^{-4}$ and the same CNN architecture described in Section~\eqref{se
 Figure~\eqref{fig:q1b_noise_schedules} illustrates the noise schedules used for each model, Figure~\eqref{fig:q1b_training_loss}
 shows the training loss for each model over 100 epochs, and Figure~\eqref{fig:q1b_short_long_model_nd} illustrates the encoding
 and decoding process for the long and short models.
+The Frechet Inception Distance (FID) was calculated for each model as the model was trained, as shown in Figure~\eqref{fig:q1b_fid}.
+Traditionally, the FID is calculated with the InceptionV3 model, however, given the narrow context of the MNIST dataset,
+a simple CNN classifier model was trained on the MNIST dataset and the 1024-length feature vector at
+the penultimate layer of this classifier was used to calculate the FID instead.
+The MNIST classifier was trained for 7 epochs and attained an accuracy of 99.2\% on the test set, which meant the penultimate
+layer was a good feature extractor for the MNIST dataset.
+Figure~\eqref{fig:q1b_fid} illustrates that neither model achieved any significant improvement over the others over the
+100 epochs, and as expected, the loss curve on Figure~\eqref{fig:q1b_training_loss} matches perfectly with the FID curve.
 
 

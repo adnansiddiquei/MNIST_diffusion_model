@@ -242,6 +242,7 @@ class CNNClassifier(nn.Module):
                  n_classes: int,
                  expected_shape: tuple[int, int] = (28, 28),
                  kernel_size: int = 5,
+                 adaptive_pooling_output_size: tuple[int, int] = (1, 1),
                  act=nn.GELU
                  ):
         super().__init__()
@@ -262,14 +263,19 @@ class CNNClassifier(nn.Module):
 
             last = hidden  # The number of input channels for the next convolutional block
 
+        self.adaptive_pooling = nn.AdaptiveAvgPool2d(adaptive_pooling_output_size)
+
         # fully connected layer to output class probabilities
-        self.final = nn.Linear(last * 28 * 28, n_classes)
+        self.final = nn.Linear(last * np.prod(adaptive_pooling_output_size), n_classes)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         for block in self.blocks:
             x = block(x)
 
-        # flatten the dimensions for the last layer
+        # apply adaptive pooling to get a fixed size tensor
+        x = self.adaptive_pooling(x)
+
+        # flatten the tensor for the final layer
         x = x.view(x.shape[0], -1)
         output = self.final(x)
 
