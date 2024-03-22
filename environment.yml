@@ -14,6 +14,7 @@ dependencies:
   - tqdm==4.66.2
   - jupyter
   - matplotlib
+  - scipy
 
 
 

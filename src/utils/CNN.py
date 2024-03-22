@@ -233,3 +233,50 @@ class CNN(nn.Module):
             embed = block(embed)
 
         return embed
+
+
+class CNNClassifier(nn.Module):
+    def __init__(self,
+                 in_channels: int,
+                 n_hidden: tuple[int, ...],
+                 n_classes: int,
+                 expected_shape: tuple[int, int] = (28, 28),
+                 kernel_size: int = 5,
+                 adaptive_pooling_output_size: tuple[int, int] = (1, 1),
+                 act=nn.GELU
+                 ):
+        super().__init__()
+        last = in_channels  # The number of input channels for the first convolutional block
+
+        self.blocks = nn.ModuleList()
+
+        for hidden in n_hidden:
+            self.blocks.append(
+                CNNBlock(
+                    last,  # No. of input channels for final Conv2d layer
+                    hidden,  # No. of output channels for final Conv2d layer
+                    expected_shape=expected_shape,  # default is (28, 28)
+                    kernel_size=kernel_size,
+                    act=act,
+                )
+            )
+
+            last = hidden  # The number of input channels for the next convolutional block
+
+        self.adaptive_pooling = nn.AdaptiveAvgPool2d(adaptive_pooling_output_size)
+
+        # fully connected layer to output class probabilities
+        self.final = nn.Linear(last * np.prod(adaptive_pooling_output_size), n_classes)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        for block in self.blocks:
+            x = block(x)
+
+        # apply adaptive pooling to get a fixed size tensor
+        x = self.adaptive_pooling(x)
+
+        # flatten the tensor for the final layer
+        x = x.view(x.shape[0], -1)
+        output = self.final(x)
+
+        return output
