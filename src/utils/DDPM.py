@@ -26,7 +26,9 @@ class DDPM(nn.Module):
 
         Parameters
         ----------
-        gt
+        gt : nn.Module
+            The model to use for estimating the diffusion process. This model should take in the latent variable z_t
+            and the time step t, and output the predicted error term.
         betas : Tuple[float, float]
          A tuple specifying the range of beta values for the noise schedule. Betas control the amount of noise added
          at each step of the diffusion process.
