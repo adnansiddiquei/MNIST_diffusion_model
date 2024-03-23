@@ -13,16 +13,23 @@ def main():
     output_dir = create_dir_if_required(__file__, 'outputs')
     output_dir = create_dir_if_required(f'{output_dir}/outputs', 'mnist_classifier')
 
-    tf = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (1.0))])
+    tf = transforms.Compose(
+        [transforms.ToTensor(), transforms.Normalize((0.5,), (1.0))]
+    )
 
-    train_dataset = MNIST("./data", train=True, download=True, transform=tf)
-    train_dataloader = DataLoader(train_dataset, batch_size=128, shuffle=True, num_workers=4, drop_last=True)
+    train_dataset = MNIST('./data', train=True, download=True, transform=tf)
+    train_dataloader = DataLoader(
+        train_dataset, batch_size=128, shuffle=True, num_workers=4, drop_last=True
+    )
 
-    test_dataset = MNIST("./data", train=False, download=True, transform=tf)
-    test_dataloader = DataLoader(test_dataset, batch_size=128, shuffle=False, num_workers=4, drop_last=True)
+    test_dataset = MNIST('./data', train=False, download=True, transform=tf)
+    test_dataloader = DataLoader(
+        test_dataset, batch_size=128, shuffle=False, num_workers=4, drop_last=True
+    )
 
-    model = CNNClassifier(1, (32, 64, 128, 64), 10,
-                          adaptive_pooling_output_size=(4, 4))  # epoch 7, 99.23% test accuracy
+    model = CNNClassifier(
+        1, (32, 64, 128, 64), 10, adaptive_pooling_output_size=(4, 4)
+    )  # epoch 7, 99.23% test accuracy
     loss_fn = nn.CrossEntropyLoss()
     optim = torch.optim.Adam(model.parameters(), lr=2e-4)
 
@@ -48,7 +55,9 @@ def main():
             train_loss.append(loss.item())
 
             avg_loss = np.average(train_loss[-100:])
-            pbar.set_description(f"loss: {avg_loss:.3g}")  # Show running average of loss in progress bar
+            pbar.set_description(
+                f'loss: {avg_loss:.3g}'
+            )  # Show running average of loss in progress bar
 
             optim.step()
 
@@ -72,12 +81,14 @@ def main():
         # Calculate accuracy
         accuracy = correct_count / len(test_dataset)
 
-        print(f'Epoch [{i + 1}/{n_epoch}], Test Loss: {avg_test_loss:.4f}, Accuracy: {accuracy:.2%}')
+        print(
+            f'Epoch [{i + 1}/{n_epoch}], Test Loss: {avg_test_loss:.4f}, Accuracy: {accuracy:.2%}'
+        )
 
-        torch.save(ddpm.state_dict(), f"{output_dir}/model_{i}.pth")
+        torch.save(ddpm.state_dict(), f'{output_dir}/model_{i}.pth')
 
-    save_pickle(train_loss, f"{output_dir}/train_loss.pkl")
-    save_pickle(test_loss, f"{output_dir}/train_loss.pkl")
+    save_pickle(train_loss, f'{output_dir}/train_loss.pkl')
+    save_pickle(test_loss, f'{output_dir}/train_loss.pkl')
 
 
 if __name__ == '__main__':

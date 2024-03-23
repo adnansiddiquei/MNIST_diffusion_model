@@ -10,13 +10,12 @@ from utils import save_pickle
 
 class DiffusionModelTrainer:
     def __init__(
-            self,
-            model: nn.Module,
-            dataloader: DataLoader,
-            optim: torch.optim.Optimizer = None,
-            accelerator: Accelerator = None,
+        self,
+        model: nn.Module,
+        dataloader: DataLoader,
+        optim: torch.optim.Optimizer = None,
+        accelerator: Accelerator = None,
     ):
-
         self.model = model
         self.optim = optim
         self.dataloader = dataloader
@@ -29,7 +28,9 @@ class DiffusionModelTrainer:
         if self.accelerator is None:
             self.accelerator = Accelerator()
 
-        self.model, self.optim, self.dataloader = self.accelerator.prepare(self.model, self.optim, self.dataloader)
+        self.model, self.optim, self.dataloader = self.accelerator.prepare(
+            self.model, self.optim, self.dataloader
+        )
 
     def train(self, n_epoch, save_folder):
         for i in range(n_epoch):
@@ -46,25 +47,26 @@ class DiffusionModelTrainer:
 
                 self.losses.append(loss.item())
 
-                avg_loss = np.average(
-                    self.losses[min(len(self.losses) - 100, 0):]
-                )
+                avg_loss = np.average(self.losses[min(len(self.losses) - 100, 0) :])
 
-                pbar.set_description(f"loss: {avg_loss:.3g}")  # Show running average of loss in progress bar
+                pbar.set_description(
+                    f'loss: {avg_loss:.3g}'
+                )  # Show running average of loss in progress bar
 
                 self.optim.step()
 
             self.model.eval()
 
             with torch.no_grad():
-                xh = self.model.sample(16, (1, 28, 28),
-                                       self.accelerator.device)  # Can get device explicitly with `accelerator.device`
+                xh = self.model.sample(
+                    16, (1, 28, 28), self.accelerator.device
+                )  # Can get device explicitly with `accelerator.device`
                 grid = make_grid(xh, nrow=4)
 
                 # Save samples to `./contents` directory
-                save_image(grid, f"{save_folder}/sample_{i:04d}.png")
+                save_image(grid, f'{save_folder}/sample_{i:04d}.png')
 
                 # save model
-                torch.save(self.model.state_dict(), f"{save_folder}/model_{i}.pth")
+                torch.save(self.model.state_dict(), f'{save_folder}/model_{i}.pth')
 
-        save_pickle(self.losses, f"{save_folder}/losses.pkl")
+        save_pickle(self.losses, f'{save_folder}/losses.pkl')

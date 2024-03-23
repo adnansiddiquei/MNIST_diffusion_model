@@ -22,7 +22,13 @@ def format_axes(ax: Axes | list[Axes], **kwargs):
             labels.extend(labels2)
 
             # into  a single legend
-            ax[0].legend(handles, labels, loc='best' if 'legend_loc' not in kwargs.keys() else kwargs['legend_loc'])
+            ax[0].legend(
+                handles,
+                labels,
+                loc='best'
+                if 'legend_loc' not in kwargs.keys()
+                else kwargs['legend_loc'],
+            )
 
         return
 

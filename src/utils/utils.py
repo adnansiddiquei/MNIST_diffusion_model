@@ -26,7 +26,7 @@ def save_pickle(obj: object, path: str) -> None:
         The path to save the object to.
 
     """
-    with open(path, "wb") as f:
+    with open(path, 'wb') as f:
         pickle.dump(obj, f)
 
 
@@ -45,7 +45,7 @@ def load_pickle(path: str) -> object:
         The Python object loaded from the pickle file.
 
     """
-    with open(path, "rb") as f:
+    with open(path, 'rb') as f:
         return pickle.load(f)
 
 
@@ -75,12 +75,14 @@ def ddpm_schedules(beta1: float, beta2: float, T: int) -> Dict[str, torch.Tensor
         Both schedules are returned as tensors of shape (T+1,).
 
     """
-    assert beta1 < beta2 < 1.0, "beta1 and beta2 must be in (0, 1)"
+    assert beta1 < beta2 < 1.0, 'beta1 and beta2 must be in (0, 1)'
 
     # Create a linear schedule from `beta1` to `beta2` over `T` timesteps
     beta_t = (beta2 - beta1) * torch.arange(0, T + 1, dtype=torch.float32) / T + beta1
 
     # Compute the corresponding `alpha_t` schedule (Sec 18.2.1, Eqn, 18.7; Prince)
-    alpha_t = torch.exp(torch.cumsum(torch.log(1 - beta_t), dim=0))  # Cumprod in log-space (better precision)
+    alpha_t = torch.exp(
+        torch.cumsum(torch.log(1 - beta_t), dim=0)
+    )  # Cumprod in log-space (better precision)
 
-    return {"beta_t": beta_t, "alpha_t": alpha_t}
+    return {'beta_t': beta_t, 'alpha_t': alpha_t}

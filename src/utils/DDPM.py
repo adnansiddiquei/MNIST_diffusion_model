@@ -13,11 +13,11 @@ from .utils import ddpm_schedules
 
 class DDPM(nn.Module):
     def __init__(
-            self,
-            gt: nn.Module,
-            betas: Tuple[float, float],
-            n_T: int,
-            criterion: nn.Module = nn.MSELoss(),
+        self,
+        gt: nn.Module,
+        betas: Tuple[float, float],
+        n_T: int,
+        criterion: nn.Module = nn.MSELoss(),
     ) -> None:
         """
         Denoising Diffusion Probabilistic Model (DDPM) class.
@@ -47,10 +47,10 @@ class DDPM(nn.Module):
 
         # `register_buffer` will track these tensors for device placement, but
         # not store them as model parameters. This is useful for constants.
-        self.register_buffer("beta_t", noise_schedule["beta_t"])
+        self.register_buffer('beta_t', noise_schedule['beta_t'])
         self.beta_t  # Exists! Set by register_buffer
 
-        self.register_buffer("alpha_t", noise_schedule["alpha_t"])
+        self.register_buffer('alpha_t', noise_schedule['alpha_t'])
         self.alpha_t
 
         self.n_T = n_T
@@ -84,7 +84,9 @@ class DDPM(nn.Module):
 
         return self.criterion(eps, preds)
 
-    def sample(self, n_sample: int, size, device, checkpoints: list = None) -> torch.Tensor:
+    def sample(
+        self, n_sample: int, size, device, checkpoints: list = None
+    ) -> torch.Tensor:
         """
         Algorithm 18.2 in Prince.
 
@@ -111,7 +113,11 @@ class DDPM(nn.Module):
         """
         # create a checkpoints tensor, if required, to store the latent variable at the specified time steps
         checkpoints = list(checkpoints) if checkpoints else None
-        checkpoint_tensors = torch.empty(n_sample, len(checkpoints) + 2, *size, device=device) if checkpoints else None
+        checkpoint_tensors = (
+            torch.empty(n_sample, len(checkpoints) + 2, *size, device=device)
+            if checkpoints
+            else None
+        )
 
         # Create a tensor of ones with the same shape as the number of samples
         _one = torch.ones(n_sample, device=device)
@@ -133,7 +139,9 @@ class DDPM(nn.Module):
             # Subtract an estimate of the noise from the latent variable, make sure
             # to scale down the noise by the same amount the noise was scaled up by
             # during the forward pass
-            z_t -= (beta_t / torch.sqrt(1 - alpha_t)) * self.gt(z_t, (i / self.n_T) * _one)
+            z_t -= (beta_t / torch.sqrt(1 - alpha_t)) * self.gt(
+                z_t, (i / self.n_T) * _one
+            )
             z_t /= torch.sqrt(1 - beta_t)
 
             # if this iteration is a checkpoint value, save the latent variable into the checkpoint tensor
@@ -153,4 +161,3 @@ class DDPM(nn.Module):
                 checkpoint_tensors[i, -1] = z_t[i]
 
         return z_t if checkpoints is None else checkpoint_tensors
-

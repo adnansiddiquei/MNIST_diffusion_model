@@ -17,20 +17,23 @@ def multiple_blur_image(image, kernel_size, sigma, iters):
 
 
 def batch_blur(batch, timestep, kernel_size, sigma):
-    return torch.stack([
-        multiple_blur_image(batch[i], kernel_size, sigma, timestep[i]) for i in range(batch.shape[0])
-    ])
+    return torch.stack(
+        [
+            multiple_blur_image(batch[i], kernel_size, sigma, timestep[i])
+            for i in range(batch.shape[0])
+        ]
+    )
 
 
 class GaussianBlurDM(nn.Module):
     def __init__(
-            self,
-            gt: nn.Module,
-            kernel_size: int,
-            sigma: float,
-            n_T: int,
-            mnist_dataset: MNIST,
-            criterion: nn.Module = nn.MSELoss(),
+        self,
+        gt: nn.Module,
+        kernel_size: int,
+        sigma: float,
+        n_T: int,
+        mnist_dataset: MNIST,
+        criterion: nn.Module = nn.MSELoss(),
     ) -> None:
         super().__init__()
 
@@ -55,23 +58,33 @@ class GaussianBlurDM(nn.Module):
 
         return self.criterion(x, preds)
 
-    def sample(self, n_sample: int, size, device, checkpoints: list = None) -> torch.Tensor:
+    def sample(
+        self, n_sample: int, size, device, checkpoints: list = None
+    ) -> torch.Tensor:
         dataloader = DataLoader(
             Subset(self.mnist_dataset, indices=range(n_sample * 2)),
-            batch_size=n_sample, shuffle=True, num_workers=4, drop_last=True)
+            batch_size=n_sample,
+            shuffle=True,
+            num_workers=4,
+            drop_last=True,
+        )
 
         x, _ = next(iter(dataloader))
         _one = torch.ones(n_sample, device=device)
 
         # we generate z_T by blurring some initial MNIST images n_T times.
-        z_t = batch_blur(x, [self.n_T] * n_sample, self.kernel_size, self.sigma).float().to(device)
+        z_t = (
+            batch_blur(x, [self.n_T] * n_sample, self.kernel_size, self.sigma)
+            .float()
+            .to(device)
+        )
 
         for t in range(self.n_T, 0, -1):
             x_0_pred = self.gt(z_t, (t / self.n_T) * _one)
-            z_t = (z_t
-                   - batch_blur(x_0_pred, [t] * n_sample, self.kernel_size, self.sigma)
-                   + batch_blur(x_0_pred, [t - 1] * n_sample, self.kernel_size, self.sigma)
-                   )
+            z_t = (
+                z_t
+                - batch_blur(x_0_pred, [t] * n_sample, self.kernel_size, self.sigma)
+                + batch_blur(x_0_pred, [t - 1] * n_sample, self.kernel_size, self.sigma)
+            )
 
         return z_t
-
