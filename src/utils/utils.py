@@ -1,6 +1,17 @@
 from typing import Dict
 import torch
 import pickle
+import os
+
+
+def create_dir_if_required(script_filepath: str, dir_name: str) -> str:
+    cwd = os.path.dirname(os.path.realpath(script_filepath))
+    dir_to_make = os.path.join(cwd, dir_name)
+
+    if not os.path.exists(os.path.join(cwd, dir_name)):
+        os.makedirs(dir_to_make)
+
+    return dir_to_make
 
 
 def save_pickle(obj: object, path: str) -> None:
