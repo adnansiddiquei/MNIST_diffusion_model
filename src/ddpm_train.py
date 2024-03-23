@@ -1,11 +1,9 @@
 from utils import (
     create_dir_if_required,
     DiffusionModelTrainer,
-    GaussianBlurDM,
     CNN,
     DDPM,
 )
-import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision.transforms import transforms
