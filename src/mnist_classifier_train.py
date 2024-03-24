@@ -1,4 +1,11 @@
-from utils import create_dir_if_required, CNNClassifier, save_pickle
+from utils import (
+    create_dir_if_required,
+    CNNClassifier,
+    save_pickle,
+    find_latest_model,
+    load_pickle,
+    calc_loss_per_epoch,
+)
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -10,12 +17,10 @@ import numpy as np
 
 
 def main():
-    output_dir = create_dir_if_required(__file__, 'outputs')
-    output_dir = create_dir_if_required(f'{output_dir}/outputs', 'mnist_classifier')
+    create_dir_if_required(__file__, 'outputs')
+    output_dir = create_dir_if_required(__file__, 'outputs/mnist_classifier')
 
-    tf = transforms.Compose(
-        [transforms.ToTensor(), transforms.Normalize((0.5,), (1.0))]
-    )
+    tf = transforms.Compose([transforms.ToTensor()])
 
     train_dataset = MNIST('./data', train=True, download=True, transform=tf)
     train_dataloader = DataLoader(
@@ -30,10 +35,12 @@ def main():
     model = CNNClassifier(
         1, (32, 64, 128, 64), 10, adaptive_pooling_output_size=(4, 4)
     )  # epoch 7, 99.23% test accuracy
+
     loss_fn = nn.CrossEntropyLoss()
     optim = torch.optim.Adam(model.parameters(), lr=2e-4)
 
     accelerator = Accelerator()
+
     ddpm, optim, train_dataloader, test_dataloader = accelerator.prepare(
         model, optim, train_dataloader, test_dataloader
     )
@@ -41,6 +48,17 @@ def main():
     n_epoch = 100
     train_loss = []
     test_loss = []
+
+    latest_model, latest_model_epoch = find_latest_model(output_dir)
+
+    if latest_model is not None:
+        model.load_state_dict(latest_model)
+        train_loss = load_pickle(f'{output_dir}/train_losses_batch.pkl')
+        test_loss = load_pickle(f'{output_dir}/test_losses_batch.pkl')
+
+        print(
+            f'Successfully loaded model {latest_model_epoch} and losses from previous training session.'
+        )
 
     for i in range(n_epoch):
         model.train()
@@ -56,7 +74,7 @@ def main():
 
             avg_loss = np.average(train_loss[-100:])
             pbar.set_description(
-                f'loss: {avg_loss:.3g}'
+                f'Epoch {i} --- Train loss: {avg_loss:.3g}'
             )  # Show running average of loss in progress bar
 
             optim.step()
@@ -81,14 +99,21 @@ def main():
         # Calculate accuracy
         accuracy = correct_count / len(test_dataset)
 
-        print(
-            f'Epoch [{i + 1}/{n_epoch}], Test Loss: {avg_test_loss:.4f}, Accuracy: {accuracy:.2%}'
-        )
+        print(f'Epoch {i}, Test Loss: {avg_test_loss:.4f}, Accuracy: {accuracy:.2%}')
 
         torch.save(ddpm.state_dict(), f'{output_dir}/model_{i}.pth')
 
-    save_pickle(train_loss, f'{output_dir}/train_loss.pkl')
-    save_pickle(test_loss, f'{output_dir}/train_loss.pkl')
+        # save the losses
+        save_pickle(train_loss, f'{output_dir}/train_losses_batch.pkl')
+        save_pickle(test_loss, f'{output_dir}/train_losses_batch.pkl')
+
+        save_pickle(
+            calc_loss_per_epoch(train_loss), f'{output_dir}/train_losses_epoch.pkl'
+        )
+
+        save_pickle(
+            calc_loss_per_epoch(test_loss, 78), f'{output_dir}/test_losses_epoch.pkl'
+        )
 
 
 if __name__ == '__main__':

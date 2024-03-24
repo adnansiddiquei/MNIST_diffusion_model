@@ -5,27 +5,7 @@ from accelerate import Accelerator
 from torchvision.utils import make_grid, save_image
 from tqdm import tqdm
 import numpy as np
-from utils import save_pickle, load_pickle, calc_loss_per_epoch
-import re
-import os
-
-
-def find_latest_model(folder_path: str):
-    pattern = re.compile(r'model_(\d+)\.pth')
-    filenames = os.listdir(folder_path)
-
-    completed_epochs = [
-        int(pattern.match(filename).group(1))
-        for filename in filenames
-        if pattern.match(filename)
-    ]
-
-    if len(completed_epochs) == 0:
-        return None, -1
-
-    latest_model_epoch = np.max(completed_epochs)
-    state_dict = torch.load(f'{folder_path}/model_{latest_model_epoch}.pth')
-    return state_dict, latest_model_epoch
+from utils import save_pickle, load_pickle, calc_loss_per_epoch, find_latest_model
 
 
 class DiffusionModelTrainer:

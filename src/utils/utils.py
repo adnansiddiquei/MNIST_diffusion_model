@@ -3,6 +3,25 @@ import torch
 import pickle
 import os
 import numpy as np
+import re
+
+
+def find_latest_model(folder_path: str):
+    pattern = re.compile(r'model_(\d+)\.pth')
+    filenames = os.listdir(folder_path)
+
+    completed_epochs = [
+        int(pattern.match(filename).group(1))
+        for filename in filenames
+        if pattern.match(filename)
+    ]
+
+    if len(completed_epochs) == 0:
+        return None, -1
+
+    latest_model_epoch = np.max(completed_epochs)
+    state_dict = torch.load(f'{folder_path}/model_{latest_model_epoch}.pth')
+    return state_dict, latest_model_epoch
 
 
 def create_dir_if_required(script_filepath: str, dir_name: str) -> str:

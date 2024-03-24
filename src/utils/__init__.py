@@ -4,6 +4,7 @@ from .utils import (
     load_pickle,
     create_dir_if_required,
     calc_loss_per_epoch,
+    find_latest_model,
 )
 from .CNN import CNNBlock, CNN, CNNClassifier
 from .DDPM import DDPM
