@@ -1,5 +1,11 @@
-from .utils import ddpm_schedules, save_pickle, load_pickle, create_dir_if_required
+from .utils import (
+    ddpm_schedules,
+    save_pickle,
+    load_pickle,
+    create_dir_if_required,
+    calc_loss_per_epoch,
+)
 from .CNN import CNNBlock, CNN, CNNClassifier
 from .DDPM import DDPM
-from .GaussianBlurDM import GaussianBlurDM, blur_image, multiple_blur_image
+from .GaussianBlurDM import GaussianBlurDM, batch_blur, gaussian_blur_schedule
 from .DiffusionModelTrainer import DiffusionModelTrainer

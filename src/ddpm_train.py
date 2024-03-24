@@ -12,11 +12,15 @@ from torchvision.datasets import MNIST
 
 def main():
     output_dir = create_dir_if_required(__file__, 'outputs')
-    output_dir = create_dir_if_required(f'{output_dir}/outputs', 'ddpm')
+    output_dir = create_dir_if_required(__file__, 'outputs/ddpm')
+    create_dir_if_required(__file__, 'outputs/ddpm/default_model')
+    create_dir_if_required(__file__, 'outputs/ddpm/short_model')
+    create_dir_if_required(__file__, 'outputs/ddpm/long_model')
 
-    tf = transforms.Compose(
-        [transforms.ToTensor(), transforms.Normalize((0.5,), (1.0))]
-    )
+    # tf = transforms.Compose(
+    #     [transforms.ToTensor(), transforms.Normalize((0.5,), (1.0))]
+    # )
+    tf = transforms.Compose([transforms.ToTensor()])
     dataset = MNIST('./data', train=True, download=True, transform=tf)
     dataloader = DataLoader(
         dataset, batch_size=128, shuffle=True, num_workers=4, drop_last=True
@@ -24,7 +28,10 @@ def main():
 
     # train the default model
     gt_1 = CNN(
-        in_channels=1, expected_shape=(28, 28), n_hidden=(16, 32, 32, 16), act=nn.GELU
+        in_channels=1,
+        expected_shape=(28, 28),
+        n_hidden=(16, 32, 64, 32, 16),
+        act=nn.GELU,
     )
     ddpm_1 = DDPM(gt=gt_1, betas=(1e-4, 0.02), n_T=1000)
     trainer = DiffusionModelTrainer(ddpm_1, dataloader)
@@ -32,7 +39,10 @@ def main():
 
     # train the short model
     gt_2 = CNN(
-        in_channels=1, expected_shape=(28, 28), n_hidden=(16, 32, 32, 16), act=nn.GELU
+        in_channels=1,
+        expected_shape=(28, 28),
+        n_hidden=(16, 32, 64, 32, 16),
+        act=nn.GELU,
     )
     ddpm_2 = DDPM(gt=gt_2, betas=(1e-4, 0.1), n_T=200)
     trainer = DiffusionModelTrainer(ddpm_2, dataloader)
@@ -40,7 +50,10 @@ def main():
 
     # train the long model
     gt_3 = CNN(
-        in_channels=1, expected_shape=(28, 28), n_hidden=(16, 32, 32, 16), act=nn.GELU
+        in_channels=1,
+        expected_shape=(28, 28),
+        n_hidden=(16, 32, 64, 32, 16),
+        act=nn.GELU,
     )
     ddpm_3 = DDPM(gt=gt_3, betas=(1e-4, 0.004), n_T=5000)
     trainer = DiffusionModelTrainer(ddpm_3, dataloader)

@@ -8,6 +8,7 @@ src/contents/ddpm_mnist.pth
 src/outputs
 docs/
 .vscode/
+data/
 
 ### TeX template
 ## Core latex/pdflatex auxiliary files:

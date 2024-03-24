@@ -2,6 +2,7 @@ from typing import Dict
 import torch
 import pickle
 import os
+import numpy as np
 
 
 def create_dir_if_required(script_filepath: str, dir_name: str) -> str:
@@ -47,6 +48,20 @@ def load_pickle(path: str) -> object:
     """
     with open(path, 'rb') as f:
         return pickle.load(f)
+
+
+def calc_loss_per_epoch(losses, batches_per_epoch=468):
+    """Calculate the loss per epoch given a list of losses per batch, across multiple epochs."""
+
+    loss_per_epoch = []
+    n_epochs = int(len(losses) / 468)
+
+    for i in range(n_epochs):
+        start_idx = batches_per_epoch * i
+        end_indx = start_idx + batches_per_epoch
+        loss_per_epoch.append(np.mean(losses[start_idx:end_indx]))
+
+    return loss_per_epoch
 
 
 def ddpm_schedules(beta1: float, beta2: float, T: int) -> Dict[str, torch.Tensor]:
