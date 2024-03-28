@@ -2,10 +2,15 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from accelerate import Accelerator
-from torchvision.utils import make_grid, save_image
 from tqdm import tqdm
 import numpy as np
-from utils import save_pickle, load_pickle, calc_loss_per_epoch, find_latest_model
+from utils import (
+    save_pickle,
+    load_pickle,
+    calc_loss_per_epoch,
+    find_latest_model,
+    save_images,
+)
 
 
 class DiffusionModelTrainer:
@@ -32,7 +37,7 @@ class DiffusionModelTrainer:
             self.model, self.optim, self.dataloader
         )
 
-    def train(self, n_epoch, save_folder):
+    def train(self, n_epoch, save_folder, save_init_images=False):
         latest_model, latest_model_epoch = find_latest_model(save_folder)
 
         if latest_model is not None:
@@ -68,13 +73,19 @@ class DiffusionModelTrainer:
             self.model.eval()
 
             with torch.no_grad():
-                xh = self.model.sample(
-                    16, (1, 28, 28), self.accelerator.device
-                )  # Can get device explicitly with `accelerator.device`
-                grid = make_grid(xh, nrow=4)
+                if save_init_images:
+                    xh, init_images = self.model.sample(
+                        16,
+                        (1, 28, 28),
+                        self.accelerator.device,
+                        return_initial_images=True,
+                    )
 
-                # Save samples to `./contents` directory
-                save_image(grid, f'{save_folder}/sample_{i:04d}.png')
+                    save_images(init_images, 4, f'{save_folder}/sample_init{i:04d}.png')
+                else:
+                    (xh,) = self.model.sample(16, (1, 28, 28), self.accelerator.device)
+
+                save_images(xh, 4, f'{save_folder}/sample_{i:04d}.png')
 
                 # save model_name
                 torch.save(self.model.state_dict(), f'{save_folder}/model_{i}.pth')

@@ -11,7 +11,7 @@ from .utils import (
 )
 from .CNN import CNNBlock, CNN, CNNClassifier
 from .DDPM import DDPM
-from .GaussianBlurDM import GaussianBlurDM, batch_blur, gaussian_blur_schedule
 from .DiffusionModelTrainer import DiffusionModelTrainer
 from ._load_model import load_model
 from ._generate_samples import generate_samples
+from .FashionMNISTDM import FashionMNISTDM
