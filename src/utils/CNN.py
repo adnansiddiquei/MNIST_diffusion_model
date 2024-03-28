@@ -69,13 +69,6 @@ class CNNBlock(nn.Module):
         return self.net(x)
 
 
-"""
-We then create the full CNN model_name, which is a stack of these blocks
-according to the `n_hidden` tuple, which specifies the number of
-channels at each hidden layer.
-"""
-
-
 class CNN(nn.Module):
     def __init__(
         self,
@@ -254,6 +247,27 @@ class CNNClassifier(nn.Module):
         adaptive_pooling_output_size: tuple[int, int] = (1, 1),
         act=nn.GELU,
     ):
+        """
+        A simple CNN classifier for image classification.
+
+        Parameters
+        ----------
+        in_channels : int
+            The number of input channels. For grascale images, this is 1. For RGB images, this is 3.
+        n_hidden : tuple[int, ...]
+            The number of channels at each hidden layer. This is used to specify the number of output channels
+            for each convolutional block in the network.
+        n_classes : int
+            The number of classes in the classification task.
+        expected_shape : tuple[int]
+            The expected spatial dimensions of the last 2 dimensions (height, width) of the output tensor.
+        kernel_size : int
+            The size of the kernel to be used in the convolutional layer. Default is 5x5 kernel.
+        adaptive_pooling_output_size : tuple[int, int]
+            The output size of the adaptive pooling layer. Default is (1, 1).
+        act : nn.Module
+            The activation function to use.
+        """
         super().__init__()
         last = in_channels  # The number of input channels for the first convolutional block
 

@@ -1,3 +1,9 @@
+"""
+This script trains a simple CNN classifier on the MNIST dataset.
+
+This classifier is used to compute the Frechet MNIST Distance (FMD), see report.
+"""
+
 from utils import (
     create_dir_if_required,
     CNNClassifier,
@@ -17,9 +23,11 @@ import numpy as np
 
 
 def main():
+    # Create all the output directories
     create_dir_if_required(__file__, 'outputs')
     output_dir = create_dir_if_required(__file__, 'outputs/mnist_classifier')
 
+    # Load the MNIST datasets
     tf = transforms.Compose([transforms.ToTensor()])
 
     train_dataset = MNIST('./data', train=True, download=True, transform=tf)
@@ -32,6 +40,7 @@ def main():
         test_dataset, batch_size=128, shuffle=False, num_workers=4, drop_last=True
     )
 
+    # Create the model
     model = CNNClassifier(
         1, (32, 64, 128, 64), 10, adaptive_pooling_output_size=(4, 4)
     )  # epoch 7, 99.23% test accuracy
@@ -49,6 +58,7 @@ def main():
     train_loss_batch = []
     test_loss_batch = []
 
+    # If this is a second run, the find the latest model and load it
     latest_model, latest_model_epoch = find_latest_model(output_dir)
 
     if latest_model is not None:
@@ -60,7 +70,8 @@ def main():
             f'Successfully loaded model {latest_model_epoch} and losses from previous training session.'
         )
 
-    for i in range(n_epoch):
+    # Start the training loop
+    for i in range(latest_model_epoch + 1, n_epoch):
         model.train()
 
         pbar = tqdm(train_dataloader)  # Wrap our loop with a visual progress bar
@@ -82,6 +93,7 @@ def main():
         model.eval()
         correct_count = 0
 
+        # Now test the model
         for x, label_test in test_dataloader:
             with torch.no_grad():
                 preds_test = model(x)
@@ -92,9 +104,11 @@ def main():
                 _, predicted = torch.max(preds_test.data, 1)
                 correct_count += (predicted == label_test).sum().item()
 
+        # Print and save the results to a file or std::out
         # Calculate accuracy
         accuracy = correct_count / len(test_dataset)
 
+        # Print the results, save the model and losses
         print(
             f'Epoch {i}, Test Loss: {np.mean(test_loss_batch[-78:]):.4f}, Accuracy: {accuracy:.2%}'
         )

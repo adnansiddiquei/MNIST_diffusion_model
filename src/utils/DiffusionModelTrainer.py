@@ -21,6 +21,20 @@ class DiffusionModelTrainer:
         optim: torch.optim.Optimizer = None,
         accelerator: Accelerator = None,
     ):
+        """
+        Trainer for a DDPM and FashionMNIST model.
+
+        Parameters
+        ----------
+        model : nn.Module
+            The model to train. Either a DDPM or FashionMNIST model.
+        dataloader : DataLoader
+            The dataloader to use for training the model.
+        optim : torch.optim.Optimizer
+            The optimizer to use for training the model. If None, Adam with a learning rate of 2e-4 is used.
+        accelerator : Accelerator
+            The accelerator to use for training the model. If None, a new accelerator is created.
+        """
         self.model = model
         self.optim = optim
         self.dataloader = dataloader
@@ -38,6 +52,25 @@ class DiffusionModelTrainer:
         )
 
     def train(self, n_epoch, save_folder, save_init_images=False):
+        """
+        Train the model for n_epoch epochs.
+
+        Parameters
+        ----------
+        n_epoch : int
+            The number of epochs to train the model for.
+        save_folder : str
+            The folder to save the model and losses to.
+        save_init_images : bool
+            Whether to save the initial images when sampling from the model. Defaults to false, and this will only
+            do anything for FashionMNISTDM models.
+
+        Returns
+        -------
+        None
+        """
+        # load the latest trained model and losses, if this is a second run then the model will be loaded
+        # and the training continues from the last saved epoch
         latest_model, latest_model_epoch = find_latest_model(save_folder)
 
         if latest_model is not None:
@@ -48,9 +81,11 @@ class DiffusionModelTrainer:
                 f'Successfully loaded model {latest_model_epoch} and losses from previous training session.'
             )
 
+        # start the training loop for however many epochs are specified
         for i in range(latest_model_epoch + 1, n_epoch):
             self.model.train()
 
+            # train for 1 epoch
             pbar = tqdm(self.dataloader)  # Wrap our loop with a visual progress bar
             for x, _ in pbar:
                 self.optim.zero_grad()
@@ -72,6 +107,7 @@ class DiffusionModelTrainer:
 
             self.model.eval()
 
+            # Now do some sampling and save the model and losses
             with torch.no_grad():
                 if save_init_images:
                     xh, init_images = self.model.sample(
