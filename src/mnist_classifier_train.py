@@ -45,7 +45,7 @@ def main():
         model, optim, train_dataloader, test_dataloader
     )
 
-    n_epoch = 100
+    n_epoch = 21
     train_loss_batch = []
     test_loss_batch = []
 
@@ -103,7 +103,7 @@ def main():
 
         # save the losses
         save_pickle(train_loss_batch, f'{output_dir}/train_losses_batch.pkl')
-        save_pickle(test_loss_batch, f'{output_dir}/train_losses_batch.pkl')
+        save_pickle(test_loss_batch, f'{output_dir}/test_losses_batch.pkl')
 
         save_pickle(
             calc_loss_per_epoch(train_loss_batch),

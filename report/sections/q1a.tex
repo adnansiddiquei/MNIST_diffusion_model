@@ -9,7 +9,7 @@ This section provides a detailed explanation of how the given coursework\_starte
 The notation used in this section adheres to the conventions used in Ch.18 of Understanding Deep Learning, Prince~\cite{prince}.
 
 \subsubsection{The Data}\label{subsubsec:data}
-The code loads the MNIST dataset (60000 images) and preprocesses it with \inlinecode{transforms.toTensor} which converts
+The code loads the MNIST training dataset (60000 images) and preprocesses it with \inlinecode{transforms.toTensor} which converts
 the image to a tensor and scales it to the range $[0, 1]$, followed by \inlinecode{transforms.Normalize((0.5,), (1.0))}
 which shifts the range to $[-0.5, 0.5]$.
 The scaling and range shift can help improve the training dynamics.

@@ -127,7 +127,7 @@ def calc_loss_per_epoch(losses, batches_per_epoch=468):
     """Calculate the loss per epoch given a list of losses per batch, across multiple epochs."""
 
     loss_per_epoch = []
-    n_epochs = int(len(losses) / 468)
+    n_epochs = int(len(losses) / batches_per_epoch)
 
     for i in range(n_epochs):
         start_idx = batches_per_epoch * i
