@@ -11,6 +11,7 @@ run: build
 	-v "$(PWD)/src/outputs":/usr/src/app/src/outputs \
 	-v "$(PWD)/report/figures":/usr/src/app/report/figures \
 	-v "$(PWD)/data":/usr/src/app/data \
+	-v "$(PWD)/docs":/usr/src/app/docs \
 	$(IMAGE_NAME) /bin/bash
 
 # Stop and remove the container and image

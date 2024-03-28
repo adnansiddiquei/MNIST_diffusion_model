@@ -1,10 +1,3 @@
-"""
-Here we define the actual diffusion model_name, which specifies the training
-schedule, takes an arbitrary model_name for estimating the
-diffusion process (such as the CNN above),
-and computes the corresponding loss (as well as generating samples).
-"""
-
 import torch
 import torch.nn as nn
 from typing import Tuple

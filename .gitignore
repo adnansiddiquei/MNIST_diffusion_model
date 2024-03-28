@@ -6,7 +6,6 @@ src/data/
 src/sandbox*.ipynb
 src/contents/ddpm_mnist.pth
 src/outputs
-docs/
 .vscode/
 data/
 src/plots/*.pkl

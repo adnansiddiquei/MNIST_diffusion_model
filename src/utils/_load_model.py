@@ -11,6 +11,22 @@ import torch.nn as nn
 
 
 def load_model(model_name, epoch):
+    """
+    Load a model from the specified model_name and epoch.
+
+    Parameters
+    ----------
+    model_name : str
+        The name of the model to load. The name of a model is the path to the model folder starting at `src/outputs`.
+        So the name of the default ddpm model would be 'ddpm/default_model'.
+    epoch : int
+        The epoch to load the model from.
+
+    Returns
+    -------
+    torch.nn.Module
+        The loaded model.
+    """
     current_file = os.path.realpath(__file__)
     current_dir = os.path.dirname(current_file)
 
