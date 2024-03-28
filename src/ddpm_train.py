@@ -26,7 +26,7 @@ def main():
         dataset, batch_size=128, shuffle=True, num_workers=4, drop_last=True
     )
 
-    # train the default model
+    # train the default model_name
     gt_1 = CNN(
         in_channels=1,
         expected_shape=(28, 28),
@@ -37,7 +37,7 @@ def main():
     trainer = DiffusionModelTrainer(ddpm_1, dataloader)
     trainer.train(n_epoch=100, save_folder=f'{output_dir}/default_model')
 
-    # train the short model
+    # train the short model_name
     gt_2 = CNN(
         in_channels=1,
         expected_shape=(28, 28),
@@ -48,7 +48,7 @@ def main():
     trainer = DiffusionModelTrainer(ddpm_2, dataloader)
     trainer.train(n_epoch=100, save_folder=f'{output_dir}/short_model')
 
-    # train the long model
+    # train the long model_name
     gt_3 = CNN(
         in_channels=1,
         expected_shape=(28, 28),

@@ -76,7 +76,7 @@ class DiffusionModelTrainer:
                 # Save samples to `./contents` directory
                 save_image(grid, f'{save_folder}/sample_{i:04d}.png')
 
-                # save model
+                # save model_name
                 torch.save(self.model.state_dict(), f'{save_folder}/model_{i}.pth')
 
             save_pickle(self.losses, f'{save_folder}/losses_batch.pkl')

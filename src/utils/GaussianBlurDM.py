@@ -86,7 +86,7 @@ class GaussianBlurDM(nn.Module):
     ) -> None:
         super().__init__()
 
-        # this is the decoder model that will be used to estimate the diffusion / encoder process
+        # this is the decoder model_name that will be used to estimate the diffusion / encoder process
         self.gt = gt
         self.kernel_size = kernel_size
         self.sigma_range = sigma_range

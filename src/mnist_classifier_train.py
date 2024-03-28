@@ -41,20 +41,20 @@ def main():
 
     accelerator = Accelerator()
 
-    ddpm, optim, train_dataloader, test_dataloader = accelerator.prepare(
+    model, optim, train_dataloader, test_dataloader = accelerator.prepare(
         model, optim, train_dataloader, test_dataloader
     )
 
     n_epoch = 100
-    train_loss = []
-    test_loss = []
+    train_loss_batch = []
+    test_loss_batch = []
 
     latest_model, latest_model_epoch = find_latest_model(output_dir)
 
     if latest_model is not None:
         model.load_state_dict(latest_model)
-        train_loss = load_pickle(f'{output_dir}/train_losses_batch.pkl')
-        test_loss = load_pickle(f'{output_dir}/test_losses_batch.pkl')
+        train_loss_batch = load_pickle(f'{output_dir}/train_losses_batch.pkl')
+        test_loss_batch = load_pickle(f'{output_dir}/test_losses_batch.pkl')
 
         print(
             f'Successfully loaded model {latest_model_epoch} and losses from previous training session.'
@@ -70,9 +70,9 @@ def main():
             preds = model(x)
             loss = loss_fn(preds, label)
             loss.backward()
-            train_loss.append(loss.item())
+            train_loss_batch.append(loss.item())
 
-            avg_loss = np.average(train_loss[-100:])
+            avg_loss = np.average(train_loss_batch[-100:])
             pbar.set_description(
                 f'Epoch {i} --- Train loss: {avg_loss:.3g}'
             )  # Show running average of loss in progress bar
@@ -80,7 +80,6 @@ def main():
             optim.step()
 
         model.eval()
-        test_loss_batch = []
         correct_count = 0
 
         for x, label_test in test_dataloader:
@@ -93,26 +92,27 @@ def main():
                 _, predicted = torch.max(preds_test.data, 1)
                 correct_count += (predicted == label_test).sum().item()
 
-        avg_test_loss = np.average(test_loss_batch)
-        test_loss.append(avg_test_loss)
-
         # Calculate accuracy
         accuracy = correct_count / len(test_dataset)
 
-        print(f'Epoch {i}, Test Loss: {avg_test_loss:.4f}, Accuracy: {accuracy:.2%}')
+        print(
+            f'Epoch {i}, Test Loss: {np.mean(test_loss_batch[-78:]):.4f}, Accuracy: {accuracy:.2%}'
+        )
 
-        torch.save(ddpm.state_dict(), f'{output_dir}/model_{i}.pth')
+        torch.save(model.state_dict(), f'{output_dir}/model_{i}.pth')
 
         # save the losses
-        save_pickle(train_loss, f'{output_dir}/train_losses_batch.pkl')
-        save_pickle(test_loss, f'{output_dir}/train_losses_batch.pkl')
+        save_pickle(train_loss_batch, f'{output_dir}/train_losses_batch.pkl')
+        save_pickle(test_loss_batch, f'{output_dir}/train_losses_batch.pkl')
 
         save_pickle(
-            calc_loss_per_epoch(train_loss), f'{output_dir}/train_losses_epoch.pkl'
+            calc_loss_per_epoch(train_loss_batch),
+            f'{output_dir}/train_losses_epoch.pkl',
         )
 
         save_pickle(
-            calc_loss_per_epoch(test_loss, 78), f'{output_dir}/test_losses_epoch.pkl'
+            calc_loss_per_epoch(test_loss_batch, 78),
+            f'{output_dir}/test_losses_epoch.pkl',
         )
 
 

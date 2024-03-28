@@ -10,3 +10,4 @@ from .CNN import CNNBlock, CNN, CNNClassifier
 from .DDPM import DDPM
 from .GaussianBlurDM import GaussianBlurDM, batch_blur, gaussian_blur_schedule
 from .DiffusionModelTrainer import DiffusionModelTrainer
+from ._load_model import load_model

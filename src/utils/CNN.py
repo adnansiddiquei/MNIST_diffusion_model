@@ -23,7 +23,7 @@ class CNNBlock(nn.Module):
         kernel_size: int = 7,
     ):
         """
-        A convolutional block for a larger CNN model.
+        A convolutional block for a larger CNN model_name.
 
         Parameters
         ----------
@@ -70,7 +70,7 @@ class CNNBlock(nn.Module):
 
 
 """
-We then create the full CNN model, which is a stack of these blocks
+We then create the full CNN model_name, which is a stack of these blocks
 according to the `n_hidden` tuple, which specifies the number of
 channels at each hidden layer.
 """
@@ -172,7 +172,7 @@ class CNN(nn.Module):
         )
 
         # `register_buffer` will track these tensors for device placement, but
-        # not store them as model parameters. This is useful for constants.
+        # not store them as model_name parameters. This is useful for constants.
         self.register_buffer('frequencies', frequencies)
 
     def time_encoding(self, t: torch.Tensor) -> torch.Tensor:
@@ -207,7 +207,7 @@ class CNN(nn.Module):
 
     def forward(self, x: torch.Tensor, t: torch.Tensor) -> torch.Tensor:
         """
-        Forward pass for the CNN model.
+        Forward pass for the CNN model_name.
 
         Passes the input tensor x through the first block of the CNN, then adds a time-dependent
         embedding for each time step in the decoder process. The tensor is then passed through
