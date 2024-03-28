@@ -4,6 +4,49 @@ import pickle
 import os
 import numpy as np
 import re
+from scipy.linalg import sqrtm
+from torchvision.utils import make_grid, save_image
+
+
+def save_images(images, nrow, path):
+    save_image(make_grid(images, nrow=nrow), path)
+
+
+def get_feature_vector(model, batch):
+    with torch.no_grad():
+        model.eval()
+        feature_vector = model(batch)
+        return feature_vector
+
+
+def calculate_fid(real_features, generated_features, eps=1e-6):
+    real_features = real_features.numpy()
+    generated_features = generated_features.numpy()
+
+    # Calculate the mean and covariance of the real data and the generated data
+    mu1, sigma1 = real_features.mean(axis=0), np.cov(real_features, rowvar=False)
+    mu2, sigma2 = (
+        generated_features.mean(axis=0),
+        np.cov(generated_features, rowvar=False),
+    )
+
+    # Adding a small regularization term to the diagonal of covariance matrices
+    sigma1 += np.eye(sigma1.shape[0]) * eps
+    sigma2 += np.eye(sigma2.shape[0]) * eps
+
+    # Calculate the squared difference in means
+    ssdiff = ((mu1 - mu2) ** 2.0).sum()
+
+    # Compute the square root of the product of covariances
+    covmean = sqrtm(sigma1.dot(sigma2))
+
+    # Check and correct if complex values occurred due to numerical error
+    if np.iscomplexobj(covmean):
+        covmean = covmean.real
+
+    # Calculate FID
+    fid = ssdiff + np.trace(sigma1 + sigma2 - 2.0 * covmean)
+    return fid
 
 
 def find_latest_model(folder_path: str):
