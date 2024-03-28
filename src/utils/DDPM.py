@@ -135,10 +135,6 @@ class DDPM(nn.Module):
             alpha_t = self.alpha_t[i]  # Get the alpha_t value for the current time step
             beta_t = self.beta_t[i]  # Get the beta_t value for the current time step
 
-            # TODO: understand the next 2 lines a bit more
-            # Subtract an estimate of the noise from the latent variable, make sure
-            # to scale down the noise by the same amount the noise was scaled up by
-            # during the forward pass
             z_t -= (beta_t / torch.sqrt(1 - alpha_t)) * self.gt(
                 z_t, (i / self.n_T) * _one
             )

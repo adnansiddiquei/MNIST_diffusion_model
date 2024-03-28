@@ -9,6 +9,7 @@ src/outputs
 docs/
 .vscode/
 data/
+src/plots/*.pkl
 
 ### TeX template
 ## Core latex/pdflatex auxiliary files:
