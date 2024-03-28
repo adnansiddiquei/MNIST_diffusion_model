@@ -22,7 +22,11 @@ from tqdm import tqdm
 import numpy as np
 
 
-def main():
+def mnist_classifier_train():
+    """
+    This function trains a simple CNN classifier on the MNIST dataset. It outputs the model to the
+    src/outputs/mnist_classifier directory
+    """
     # Create all the output directories
     create_dir_if_required(__file__, 'outputs')
     output_dir = create_dir_if_required(__file__, 'outputs/mnist_classifier')
@@ -131,4 +135,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    mnist_classifier_train()

@@ -9,7 +9,11 @@ from torchvision.transforms import transforms
 from torchvision.datasets import MNIST
 
 
-def main():
+def fashion_mnist_train():
+    """
+    This function trains the Fashion MNIST degradation diffusion model for 100 epochs. It outputs all the models to
+    the src/outputs/fashion_mnist directory.
+    """
     # Create all the output directories
     output_dir = create_dir_if_required(__file__, 'outputs')
     output_dir = create_dir_if_required(f'{output_dir}/outputs', 'fashion_mnist')
@@ -39,4 +43,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    fashion_mnist_train()

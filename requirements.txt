@@ -10,3 +10,5 @@ matplotlib
 scipy
 ruff
 pre-commit
+sphinx
+furo

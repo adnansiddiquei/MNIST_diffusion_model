@@ -16,7 +16,11 @@ from torchvision.transforms import transforms
 from torchvision.datasets import MNIST
 
 
-def main():
+def ddpm_train():
+    """
+    This function trains the 3 DDPM models on the MNIST dataset for 100 epochs each. It outputs all the models to
+    the src/outputs/ddpm directory.
+    """
     # Create all the output directories
     output_dir = create_dir_if_required(__file__, 'outputs')
     output_dir = create_dir_if_required(__file__, 'outputs/ddpm')
@@ -65,4 +69,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    ddpm_train()

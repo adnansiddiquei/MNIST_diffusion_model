@@ -17,3 +17,5 @@ dependencies:
   - scipy
   - ruff
   - pre-commit
+  - sphinx
+  - furo
