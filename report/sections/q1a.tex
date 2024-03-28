@@ -5,11 +5,11 @@
 \subsection{coursework\_starter.ipynb}\label{subsec:q1a}
 The code provided in the coursework\_starter.ipynb notebook trains a regular denoising diffusion probabilistic model
 (DDPM) on the MNIST dataset, using the \inlinecode{pytorch} library.
-This section provides a detailed explanation of how the code given coursework\_starter.ipynb code works.
+This section provides a detailed explanation of how the given coursework\_starter.ipynb code works.
 The notation used in this section adheres to the conventions used in Ch.18 of Understanding Deep Learning, Prince~\cite{prince}.
 
-\subsubsection{The data}\label{subsubsec:data}
-The code loads the MNIST dataset (60000 images) and preprocesses it with \inlinecode{transforms.toTensor} which convert
+\subsubsection{The Data}\label{subsubsec:data}
+The code loads the MNIST dataset (60000 images) and preprocesses it with \inlinecode{transforms.toTensor} which converts
 the image to a tensor and scales it to the range $[0, 1]$, followed by \inlinecode{transforms.Normalize((0.5,), (1.0))}
 which shifts the range to $[-0.5, 0.5]$.
 The scaling and range shift can help improve the training dynamics.
@@ -39,7 +39,7 @@ of the second layer so that the CNN can learn to revert the noise at any given s
     \centering
     \includegraphics[width=0.8\textwidth]{figures/q1a_noise_schedule}
     \caption{A plot of $\beta_{t}$ and $\alpha_{t}$ for the linear noise schedule used in coursework\_starter.ipynb.
-        This figure illustrates that MNIST images transition for noiseless to standard normally distributed noise non-linearly
+        This figure illustrates that MNIST images transition for noiseless to standard normally distributed noise
         over 1000 steps, with most of the noise being added by about the 600'th step.}
     \label{fig:q1a_noise_schedule}
 \end{figure}
@@ -54,7 +54,7 @@ defined in Ch.18 Prince~\cite{prince}.
 \begin{figure}[t]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/q1a_image_noising}
-    \caption{An illustration of the linear noise schedule applied to the first 4 MNIST images in the datastet.
+    \caption{An illustration of the linear noise schedule applied to the first 4 MNIST images in the training datastet.
         The first column shows the original 28x28 image, and the subsequent 10 columns show the image after 100 steps
         of the diffusion process.
         The final column shows the image after 1000 steps.}

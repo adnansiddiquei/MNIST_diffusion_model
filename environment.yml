@@ -15,6 +15,5 @@ dependencies:
   - jupyter
   - matplotlib
   - scipy
-
-
-
+  - ruff
+  - pre-commit

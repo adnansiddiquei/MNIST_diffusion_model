@@ -1,6 +1,6 @@
 """
-Here we define the actual diffusion model, which specifies the training
-schedule, takes an arbitrary model for estimating the
+Here we define the actual diffusion model_name, which specifies the training
+schedule, takes an arbitrary model_name for estimating the
 diffusion process (such as the CNN above),
 and computes the corresponding loss (as well as generating samples).
 """
@@ -13,21 +13,21 @@ from .utils import ddpm_schedules
 
 class DDPM(nn.Module):
     def __init__(
-            self,
-            gt: nn.Module,
-            betas: Tuple[float, float],
-            n_T: int,
-            criterion: nn.Module = nn.MSELoss(),
+        self,
+        gt: nn.Module,
+        betas: Tuple[float, float],
+        n_T: int,
+        criterion: nn.Module = nn.MSELoss(),
     ) -> None:
         """
         Denoising Diffusion Probabilistic Model (DDPM) class.
 
-        Used to train and sample from a diffusion model.
+        Used to train and sample from a diffusion model_name.
 
         Parameters
         ----------
         gt : nn.Module
-            The model to use for estimating the diffusion process. This model should take in the latent variable z_t
+            The model_name to use for estimating the diffusion process. This model_name should take in the latent variable z_t
             and the time step t, and output the predicted error term.
         betas : Tuple[float, float]
          A tuple specifying the range of beta values for the noise schedule. Betas control the amount of noise added
@@ -39,18 +39,18 @@ class DDPM(nn.Module):
         """
         super().__init__()
 
-        # this is the decoder model that will be used to estimate the diffusion / encoder process
+        # this is the decoder model_name that will be used to estimate the diffusion / encoder process
         self.gt = gt
 
         # Create the noise schedule, which is a dictionary of alpha_t and beta_t values
         noise_schedule = ddpm_schedules(betas[0], betas[1], n_T)
 
         # `register_buffer` will track these tensors for device placement, but
-        # not store them as model parameters. This is useful for constants.
-        self.register_buffer("beta_t", noise_schedule["beta_t"])
+        # not store them as model_name parameters. This is useful for constants.
+        self.register_buffer('beta_t', noise_schedule['beta_t'])
         self.beta_t  # Exists! Set by register_buffer
 
-        self.register_buffer("alpha_t", noise_schedule["alpha_t"])
+        self.register_buffer('alpha_t', noise_schedule['alpha_t'])
         self.alpha_t
 
         self.n_T = n_T
@@ -58,12 +58,12 @@ class DDPM(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
-        Algorithm 18.1 in Prince. Forward pass of the DDPM model.
+        Algorithm 18.1 in Prince. Forward pass of the DDPM model_name.
 
         Parameters
         ----------
         x : torch.Tensor
-         The input data to the model. Has shape...
+         The input data to the model_name. Has shape...
         """
         # sample a random time step t for each batch element
         t = torch.randint(1, self.n_T, (x.shape[0],), device=x.device)
@@ -78,17 +78,19 @@ class DDPM(nn.Module):
         # equivalent to the amount of noise that should be added at time t
         z_t = torch.sqrt(alpha_t) * x + torch.sqrt(1 - alpha_t) * eps
 
-        # Now we predict the error term using the model, we pass in the latent variable
-        # z_t and the time step t to the model, and get the model to try and predict eps.
+        # Now we predict the error term using the model_name, we pass in the latent variable
+        # z_t and the time step t to the model_name, and get the model_name to try and predict eps.
         preds = self.gt(z_t, t / self.n_T)
 
         return self.criterion(eps, preds)
 
-    def sample(self, n_sample: int, size, device, checkpoints: list = None) -> torch.Tensor:
+    def sample(
+        self, n_sample: int, size, device, checkpoints: list = None
+    ) -> torch.Tensor:
         """
         Algorithm 18.2 in Prince.
 
-        Generates samples from noise using the reverse diffusion process learned by the model.
+        Generates samples from noise using the reverse diffusion process learned by the model_name.
 
         Parameters
         ----------
@@ -111,7 +113,11 @@ class DDPM(nn.Module):
         """
         # create a checkpoints tensor, if required, to store the latent variable at the specified time steps
         checkpoints = list(checkpoints) if checkpoints else None
-        checkpoint_tensors = torch.empty(n_sample, len(checkpoints) + 2, *size, device=device) if checkpoints else None
+        checkpoint_tensors = (
+            torch.empty(n_sample, len(checkpoints) + 2, *size, device=device)
+            if checkpoints
+            else None
+        )
 
         # Create a tensor of ones with the same shape as the number of samples
         _one = torch.ones(n_sample, device=device)
@@ -133,7 +139,9 @@ class DDPM(nn.Module):
             # Subtract an estimate of the noise from the latent variable, make sure
             # to scale down the noise by the same amount the noise was scaled up by
             # during the forward pass
-            z_t -= (beta_t / torch.sqrt(1 - alpha_t)) * self.gt(z_t, (i / self.n_T) * _one)
+            z_t -= (beta_t / torch.sqrt(1 - alpha_t)) * self.gt(
+                z_t, (i / self.n_T) * _one
+            )
             z_t /= torch.sqrt(1 - beta_t)
 
             # if this iteration is a checkpoint value, save the latent variable into the checkpoint tensor
@@ -153,4 +161,3 @@ class DDPM(nn.Module):
                 checkpoint_tensors[i, -1] = z_t[i]
 
         return z_t if checkpoints is None else checkpoint_tensors
-

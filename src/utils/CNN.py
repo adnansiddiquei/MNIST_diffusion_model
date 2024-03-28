@@ -14,16 +14,16 @@ import numpy as np
 
 class CNNBlock(nn.Module):
     def __init__(
-            self,
-            in_channels: int,
-            out_channels: int,
-            *,
-            expected_shape: tuple[int, int],
-            act: nn.Module = nn.GELU,
-            kernel_size: int = 7,
+        self,
+        in_channels: int,
+        out_channels: int,
+        *,
+        expected_shape: tuple[int, int],
+        act: nn.Module = nn.GELU,
+        kernel_size: int = 7,
     ):
         """
-        A convolutional block for a larger CNN model.
+        A convolutional block for a larger CNN model_name.
 
         Parameters
         ----------
@@ -52,14 +52,17 @@ class CNNBlock(nn.Module):
         # comments below assumes batch_size=128 in_channels=1, out_channels=16, expected_shape=(28, 28), kernel_size=7
         self.net = nn.Sequential(
             nn.Conv2d(
-                in_channels, out_channels, kernel_size,
-                padding=kernel_size // 2  # creates 3 cell padding around the image, 0 padding
+                in_channels,
+                out_channels,
+                kernel_size,
+                padding=kernel_size
+                // 2,  # creates 3 cell padding around the image, 0 padding
             ),  # the Conv2d layer will output a tensor of shape (128, 16, 28, 28)
             # ^ (batch_size, out_channels, height, width)
             # LayerNorm normalizes the output of the convolutional layer, it will output a tensor of
             # shape (128, 16, 28, 28), where each batch has been normalised to standard normal
             nn.LayerNorm((out_channels, *expected_shape)),
-            act()
+            act(),
         )
 
     def forward(self, x):
@@ -67,7 +70,7 @@ class CNNBlock(nn.Module):
 
 
 """
-We then create the full CNN model, which is a stack of these blocks
+We then create the full CNN model_name, which is a stack of these blocks
 according to the `n_hidden` tuple, which specifies the number of
 channels at each hidden layer.
 """
@@ -75,14 +78,14 @@ channels at each hidden layer.
 
 class CNN(nn.Module):
     def __init__(
-            self,
-            in_channels,
-            expected_shape: tuple[int, int] = (28, 28),
-            n_hidden=(64, 128, 64),
-            kernel_size=7,
-            last_kernel_size=3,
-            time_embeddings=16,
-            act=nn.GELU,
+        self,
+        in_channels,
+        expected_shape: tuple[int, int] = (28, 28),
+        n_hidden=(64, 128, 64),
+        kernel_size=7,
+        last_kernel_size=3,
+        time_embeddings=16,
+        act=nn.GELU,
     ) -> None:
         """
         A CNN designed to be used within a Denoising Diffusion Probabilistic Model (DDPM) as the
@@ -136,7 +139,9 @@ class CNN(nn.Module):
                     act=act,
                 )
             )
-            last = hidden  # The number of input channels for the next convolutional block
+            last = (
+                hidden  # The number of input channels for the next convolutional block
+            )
 
         # The final layer, we use a regular Conv2d to get the
         # correct scale and shape (and avoid applying the activation)
@@ -152,20 +157,23 @@ class CNN(nn.Module):
         ## This part is literally just to put the single scalar "t" into the CNN
         ## in a nice, high-dimensional way:
         self.time_embed = nn.Sequential(
-            nn.Linear(time_embeddings * 2, 128), act(),
-            nn.Linear(128, 128), act(),
-            nn.Linear(128, 128), act(),
+            nn.Linear(time_embeddings * 2, 128),
+            act(),
+            nn.Linear(128, 128),
+            act(),
+            nn.Linear(128, 128),
+            act(),
             nn.Linear(128, n_hidden[0]),
         )
 
         # TODO: Unsure what the purpose of this is
         frequencies = torch.tensor(
-            [0] + [2 * np.pi * 1.5 ** i for i in range(time_embeddings - 1)]
+            [0] + [2 * np.pi * 1.5**i for i in range(time_embeddings - 1)]
         )
 
         # `register_buffer` will track these tensors for device placement, but
-        # not store them as model parameters. This is useful for constants.
-        self.register_buffer("frequencies", frequencies)
+        # not store them as model_name parameters. This is useful for constants.
+        self.register_buffer('frequencies', frequencies)
 
     def time_encoding(self, t: torch.Tensor) -> torch.Tensor:
         """
@@ -199,7 +207,7 @@ class CNN(nn.Module):
 
     def forward(self, x: torch.Tensor, t: torch.Tensor) -> torch.Tensor:
         """
-        Forward pass for the CNN model.
+        Forward pass for the CNN model_name.
 
         Passes the input tensor x through the first block of the CNN, then adds a time-dependent
         embedding for each time step in the decoder process. The tensor is then passed through
@@ -236,15 +244,16 @@ class CNN(nn.Module):
 
 
 class CNNClassifier(nn.Module):
-    def __init__(self,
-                 in_channels: int,
-                 n_hidden: tuple[int, ...],
-                 n_classes: int,
-                 expected_shape: tuple[int, int] = (28, 28),
-                 kernel_size: int = 5,
-                 adaptive_pooling_output_size: tuple[int, int] = (1, 1),
-                 act=nn.GELU
-                 ):
+    def __init__(
+        self,
+        in_channels: int,
+        n_hidden: tuple[int, ...],
+        n_classes: int,
+        expected_shape: tuple[int, int] = (28, 28),
+        kernel_size: int = 5,
+        adaptive_pooling_output_size: tuple[int, int] = (1, 1),
+        act=nn.GELU,
+    ):
         super().__init__()
         last = in_channels  # The number of input channels for the first convolutional block
 
@@ -261,7 +270,9 @@ class CNNClassifier(nn.Module):
                 )
             )
 
-            last = hidden  # The number of input channels for the next convolutional block
+            last = (
+                hidden  # The number of input channels for the next convolutional block
+            )
 
         self.adaptive_pooling = nn.AdaptiveAvgPool2d(adaptive_pooling_output_size)
 
