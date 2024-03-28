@@ -3,7 +3,8 @@
 1. [Training the models](#run)
 2. [Generating the plots](#plots)
 3. [Documentation](#docs)
-5. [Report](#report)
+4. [Report](#report)
+5. [Use of auto-generation tools](#auto)
 
 ## <a name="run"></a> 1. Training the models
 Clone the repository and then run
@@ -52,3 +53,11 @@ the docs in the container, they will be synced back to your local machine so the
 
 ## <a name="report"></a> 4. Report
 The report is located at [report/out/main.pdf](report/out/main.pdf).
+
+## <a name="auto"></a> 5. Use of auto-generation tools
+Auto-generation tools, specifically ChatGPT and co-pilot were used in a couple of instances throughout the project as
+detailed here:
+ - Co-pilot was used to assist in writing a lot of the docstrings via tab completion. These were amended as required.
+ - ChatGPT was used to assist in creating the `utils.calculate_fid` function to compute the Frechet distance between two
+ vectors.
+ - ChatGPT was used to assist in a few matplotlib plot formatting queries.
