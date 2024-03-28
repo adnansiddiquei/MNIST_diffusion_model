@@ -8,6 +8,7 @@ from .utils import (
     get_feature_vector,
     calculate_fid,
     save_images,
+    generate_image_decoding,
 )
 from .CNN import CNNBlock, CNN, CNNClassifier
 from .DDPM import DDPM

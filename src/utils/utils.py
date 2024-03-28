@@ -8,6 +8,17 @@ from scipy.linalg import sqrtm
 from torchvision.utils import make_grid, save_image
 
 
+def generate_image_decoding(model, num_samples: int, sample_range: range, device):
+    with torch.no_grad():
+        model = model.to(device)
+        samples_with_checkpoints = model.sample(
+            num_samples, (1, 28, 28), device=device, checkpoints=sample_range
+        )
+        model = model.to('cpu')
+
+    return samples_with_checkpoints.to('cpu')
+
+
 def save_images(images, nrow, path):
     save_image(make_grid(images, nrow=nrow), path)
 

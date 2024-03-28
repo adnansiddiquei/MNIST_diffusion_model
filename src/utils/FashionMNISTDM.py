@@ -19,6 +19,7 @@ class FashionMNISTDM(nn.Module):
         n_T: int,
         criterion: nn.Module = nn.MSELoss(),
         train_batch_size: int = 128,
+        sample_size: int = 16,
     ) -> None:
         super().__init__()
 
@@ -59,7 +60,7 @@ class FashionMNISTDM(nn.Module):
         self.sample_dataloader = None
         self.sample_size = None
 
-        self.set_sample_size(16)
+        self.set_sample_size(sample_size)
 
     def set_sample_size(self, n_sample: int):
         self.sample_size = n_sample
@@ -167,9 +168,9 @@ class FashionMNISTDM(nn.Module):
                 checkpoint_tensors[i, -1] = z_t[i]
 
         if checkpoints and return_initial_images:
-            return checkpoints, x
+            return checkpoint_tensors, x
         elif checkpoints and not return_initial_images:
-            return checkpoints
+            return checkpoint_tensors
         elif not checkpoints and return_initial_images:
             return z_t, x
         else:

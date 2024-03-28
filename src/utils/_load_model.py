@@ -2,7 +2,11 @@ import os
 
 import torch
 
-from . import CNN, DDPM, CNNClassifier, FashionMNISTDM
+from .CNN import CNNClassifier, CNN
+from .DDPM import DDPM
+from .FashionMNISTDM import FashionMNISTDM
+
+
 import torch.nn as nn
 
 
