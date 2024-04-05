@@ -119,7 +119,7 @@ class DiffusionModelTrainer:
 
                     save_images(init_images, 4, f'{save_folder}/sample_init{i:04d}.png')
                 else:
-                    (xh,) = self.model.sample(16, (1, 28, 28), self.accelerator.device)
+                    xh = self.model.sample(16, (1, 28, 28), self.accelerator.device)
 
                 save_images(xh, 4, f'{save_folder}/sample_{i:04d}.png')
 
